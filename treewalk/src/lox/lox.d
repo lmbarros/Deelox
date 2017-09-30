@@ -9,7 +9,7 @@ module lox.lox;
 
 public struct Lox
 {
-    public void runFile(const string file)
+    public static void runFile(const string file)
     {
         import core.stdc.stdlib: exit;
         import std.file: readText;
@@ -22,7 +22,7 @@ public struct Lox
             exit(65);
     }
 
-    public void runPrompt()
+    public static void runPrompt()
     {
         import std.stdio: readln, write;
 
@@ -34,38 +34,35 @@ public struct Lox
         }
     }
 
-    private void run(string source)
+    private static void run(string source)
     {
         import std.stdio: writeln;
         writeln("Running (well, not yet) this source:\n-----------------\n",
             source, "-----------------");
 
-        /+
-        import lex.scanner: Scanner;
-        import lex.token: Token;
+        import lox.scanner: Scanner;
 
-        auto  scanner = new Scanner(source);
-        Token[] tokens = scanner.scanTokens();
+        auto scanner = new Scanner(source);
+        auto tokens = scanner.scanTokens();
 
         // For now, just print the tokens.
         foreach (token; tokens)
         {
             writeln(token);
         }
-        +/
     }
 
-    private void error(int line, string message)
+    public static void error(int line, string message)
     {
         report(line, "", message);
     }
 
-    private void report(int line, string where, string message)
+    public static void report(int line, string where, string message)
     {
         import std.stdio: writefln;
         writefln("[line %s] Error: %s: %s", line, where, message);
         _hadError = true;
     }
 
-    private bool _hadError = false;
+    private static bool _hadError = false;
 }

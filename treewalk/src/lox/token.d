@@ -25,6 +25,6 @@ struct Token
 
   public string toString() {
       import std.conv: to;
-      return to!string(type) ~ " " ~ lexeme ~ " " ~ to!string(literal);
+      return to!string(type) ~ " '" ~ lexeme ~ "' '" ~ to!string(literal) ~ "'";
   }
 }
