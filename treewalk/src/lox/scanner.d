@@ -17,10 +17,30 @@ struct Scanner
     private int _start = 0;
     private int _current = 0;
     private int _line = 1;
+    private TokenType[string] _keywords;
 
     public this (string source)
     {
         _source = source;
+
+        _keywords = [
+            "and": TokenType.AND,
+            "class": TokenType.CLASS,
+            "else": TokenType.ELSE,
+            "false": TokenType.FALSE,
+            "for": TokenType.FOR,
+            "fun": TokenType.FUN,
+            "if": TokenType.IF,
+            "nil": TokenType.NIL,
+            "or": TokenType.OR,
+            "print": TokenType.PRINT,
+            "return": TokenType.RETURN,
+            "super": TokenType.SUPER,
+            "this": TokenType.THIS,
+            "true": TokenType.TRUE,
+            "var": TokenType.VAR,
+            "while": TokenType.WHILE
+        ];
     }
 
     Token[] scanTokens()
@@ -114,8 +134,28 @@ struct Scanner
                 scanNumber();
                 break;
 
-            default: Lox.error(_line, "Unexpected character: '" ~ c ~ "'");
+            default:
+                if (isAlpha(c))
+                    scanIdentifier();
+                else
+                    Lox.error(_line, "Unexpected character: '" ~ c ~ "'");
         }
+    }
+
+    private void scanIdentifier()
+    {
+        while (isAlphaNumeric(peek()))
+            advance();
+
+        // See if the identifier is a reserved word.
+        const text = _source[_start.._current];
+        auto type = TokenType.IDENTIFIER;
+
+        const pType = text in _keywords;
+        if (pType != null)
+            type = *pType;
+
+        addToken(type);
     }
 
     private bool isDigit(char c)
@@ -198,5 +238,17 @@ struct Scanner
         if (_current + 1 >= _source.length)
             return '\0';
         return _source[_current + 1];
+    }
+
+    private bool isAlpha(char c)
+    {
+        return (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z') ||
+            c == '_';
+    }
+
+    private bool isAlphaNumeric(char c)
+    {
+        return isAlpha(c) || isDigit(c);
     }
 }

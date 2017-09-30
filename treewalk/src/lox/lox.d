@@ -37,9 +37,6 @@ public struct Lox
     private static void run(string source)
     {
         import std.stdio: writeln;
-        writeln("Running (well, not yet) this source:\n-----------------\n",
-            source, "-----------------");
-
         import lox.scanner: Scanner;
 
         auto scanner = new Scanner(source);
