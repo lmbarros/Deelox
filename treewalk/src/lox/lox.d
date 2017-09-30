@@ -7,7 +7,7 @@
 
 module lox.lox;
 
-public class Lox
+public struct Lox
 {
     public void runFile(const string file)
     {

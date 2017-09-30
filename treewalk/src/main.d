@@ -14,7 +14,7 @@ void main(string[] args)
 
     writeln("This is deelox, treewalk version");
 
-    auto lox = new Lox();
+    Lox lox;
 
     if (args.length > 2)
     {
