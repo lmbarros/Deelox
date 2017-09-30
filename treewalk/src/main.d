@@ -22,7 +22,7 @@ void main(string[] args)
     }
     else if (args.length == 2)
     {
-        lox.runFile(args[0]);
+        lox.runFile(args[1]);
     }
     else
     {
