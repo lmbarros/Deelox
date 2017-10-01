@@ -10,7 +10,7 @@ module lox.expr;
 
 // TODO: This is just a straightforward convertion from Bob's Java code. Should
 //       work, but isn't as efficient as could be (`Token`s are passed by value,
-//       for example).
+//       for example. Those `Variant`s don't smell good either).
 private string generateASTClasses(const string baseName)
 {
     import std.algorithm.iteration: splitter;
@@ -21,11 +21,11 @@ private string generateASTClasses(const string baseName)
     {
         auto code = "";
 
-        code ~= "class " ~ className ~ ": " ~ baseName ~ "\n";
+        code ~= "public class " ~ className ~ ": " ~ baseName ~ "\n";
         code ~= "{\n";
 
         // Constructor
-        code ~= "    this(" ~ fieldList ~ ")\n";
+        code ~= "    public this(" ~ fieldList ~ ")\n";
         code ~= "    {\n";
 
         auto fields = fieldList.splitter(",");
@@ -39,14 +39,14 @@ private string generateASTClasses(const string baseName)
         code ~= "    }\n\n";
 
         // Visitor pattern
-        code ~= "    R accept(R)(Visitor!R visitor)\n"
+        code ~= "    public override Variant accept(Visitor visitor)\n"
               ~ "    {\n"
               ~ "        return visitor.visit" ~ className ~ baseName ~ "(this);\n"
               ~ "    }\n\n";
 
         // Fields
         foreach (field; fields)
-            code ~= "    " ~ field.strip ~ ";\n";
+            code ~= "    public " ~ field.strip ~ ";\n";
 
         code ~= "}\n\n";
 
@@ -57,14 +57,14 @@ private string generateASTClasses(const string baseName)
     {
         auto code = "\n";
 
-        code ~= "interface Visitor(R)\n"
+        code ~= "public interface Visitor\n"
               ~ "{\n";
 
         foreach (type; types)
         {
             import std.string: toLower;
             auto typeName = type.splitter(":").array[0].strip();
-            code ~= "    R visit" ~ typeName ~ baseName ~ "("
+            code ~= "    public Variant visit" ~ typeName ~ baseName ~ "("
                 ~ typeName ~ " " ~ baseName.toLower() ~ ");\n";
         }
 
@@ -76,14 +76,16 @@ private string generateASTClasses(const string baseName)
     const types = [
         "Binary   : Expr left, Token operator, Expr right",
         "Grouping : Expr expression",
-        "Literal  : lox.token.Literal value",
+        "Literal  : Variant value",
         "Unary    : Token operator, Expr right"
     ];
 
-    auto code = "import lox.token;\n\n"
-        ~ "abstract class " ~ baseName ~ "\n"
+    auto code = "import lox.token;\n"
+        ~ "public import std.variant;\n\n"
+
+        ~ "public abstract class " ~ baseName ~ "\n"
         ~ "{\n"
-        ~ "    abstract R accept(R)(Visitor!R visitor);\n"
+        ~ "    public abstract Variant accept(Visitor visitor);\n"
         ~ "}\n\n";
 
     code ~= defineVisitor(baseName, types);

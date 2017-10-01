@@ -7,35 +7,22 @@
 
 module lox.token;
 
-import lox.token_type: TokenType;
-
-public union Literal
-{
-    string str;
-    double number;
-}
+import std.variant;
+public import lox.token_type: TokenType;
 
 
 public struct Token
 {
     public TokenType type;
     public string lexeme;
-    public Literal literal;
+    public Variant literal;
     public int line;
 
-    public this(TokenType type, string lexeme, string literal, int line)
+    public this(T)(TokenType type, string lexeme, T literal, int line)
     {
         this.type = type;
         this.lexeme = lexeme;
-        this.literal.str = literal;
-        this.line = line;
-    }
-
-    public this(TokenType type, string lexeme, double literal, int line)
-    {
-        this.type = type;
-        this.lexeme = lexeme;
-        this.literal.number = literal;
+        this.literal = literal;
         this.line = line;
     }
 
@@ -47,9 +34,9 @@ public struct Token
         with (TokenType) switch(type)
         {
             case STRING:
-                lit = literal.str; break;
+                lit = literal.get!string(); break;
             case NUMBER:
-                lit = to!string(literal.number); break;
+                lit = to!string(literal.get!double()); break;
             default:
                 break;
         }
