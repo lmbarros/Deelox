@@ -11,7 +11,7 @@ module lox.expr;
 // TODO: This is just a straightforward convertion from Bob's Java code. Should
 //       work, but isn't as efficient as could be (`Token`s are passed by value,
 //       for example).
-private string generateASTClasses(string baseName)
+private string generateASTClasses(const string baseName)
 {
     import std.algorithm.iteration: splitter;
     import std.string: strip;
@@ -38,9 +38,35 @@ private string generateASTClasses(string baseName)
 
         code ~= "    }\n\n";
 
+        // Visitor pattern
+        code ~= "    R accept(R)(Visitor!R visitor)\n"
+              ~ "    {\n"
+              ~ "        return visitor.visit" ~ className ~ baseName ~ "(this);\n"
+              ~ "    }\n\n";
+
         // Fields
         foreach (field; fields)
             code ~= "    " ~ field.strip ~ ";\n";
+
+        code ~= "}\n\n";
+
+        return code;
+    }
+
+    string defineVisitor(const string baseName, const string[] types)
+    {
+        auto code = "\n";
+
+        code ~= "interface Visitor(R)\n"
+              ~ "{\n";
+
+        foreach (type; types)
+        {
+            import std.string: toLower;
+            auto typeName = type.splitter(":").array[0].strip();
+            code ~= "    R visit" ~ typeName ~ baseName ~ "("
+                ~ typeName ~ " " ~ baseName.toLower() ~ ");\n";
+        }
 
         code ~= "}\n\n";
 
@@ -57,7 +83,10 @@ private string generateASTClasses(string baseName)
     auto code = "import lox.token;\n\n"
         ~ "abstract class " ~ baseName ~ "\n"
         ~ "{\n"
+        ~ "    abstract R accept(R)(Visitor!R visitor);\n"
         ~ "}\n\n";
+
+    code ~= defineVisitor(baseName, types);
 
     foreach (type; types)
     {
@@ -70,3 +99,12 @@ private string generateASTClasses(string baseName)
 }
 
 mixin(generateASTClasses("Expr"));
+
+version(none)
+{
+    static this()
+    {
+        import std.stdio;
+        writeln(generateASTClasses("Expr"));
+    }
+}
