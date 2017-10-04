@@ -7,6 +7,9 @@
 
 module lox.lox;
 
+import lox.token;
+
+
 public struct Lox
 {
     public static void runFile(const string file)
@@ -52,6 +55,14 @@ public struct Lox
     public static void error(int line, string message)
     {
         report(line, "", message);
+    }
+
+    public static void error(Token token, string message)
+    {
+        if (token.type == TokenType.EOF)
+            report(token.line, " at end", message);
+        else
+            report(token.line, " at '" ~ token.lexeme ~ "'", message);
     }
 
     public static void report(int line, string where, string message)
