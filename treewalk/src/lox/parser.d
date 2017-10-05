@@ -30,6 +30,18 @@ public class Parser
         _tokens = tokens;
     }
 
+    public Expr parse()
+    {
+        try
+        {
+            return expression();
+        }
+        catch (ParseError error)
+        {
+            return null;
+        }
+    }
+
     private Expr expression()
     {
         return equality();
@@ -121,7 +133,7 @@ public class Parser
             return new Grouping(expr);
         }
 
-        assert(false, "Can't happen");
+        throw error(peek(), "Expect expression.");
     }
 
     // Consumes the token.
@@ -184,4 +196,34 @@ public class Parser
         Lox.error(token, message);
         return new ParseError();
     }
+
+    private void synchronize()
+    {
+        advance();
+
+        while (!isAtEnd())
+        {
+            if (previous().type == TokenType.SEMICOLON)
+                return;
+
+            with (TokenType) switch (peek().type)
+            {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+
+                default:
+                    break;
+            }
+
+            advance();
+        }
+  }
+
 }

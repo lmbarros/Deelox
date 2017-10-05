@@ -41,15 +41,21 @@ public struct Lox
     {
         import std.stdio: writeln;
         import lox.scanner: Scanner;
+        import lox.parser: Parser;
+        import lox.expr: Expr;
+        import lox.ast_printer: ASTPrinter;
 
         auto scanner = new Scanner(source);
         auto tokens = scanner.scanTokens();
 
-        // For now, just print the tokens.
-        foreach (token; tokens)
-        {
-            writeln(token);
-        }
+        auto parser = new Parser(tokens);
+        auto expression = parser.parse();
+
+        // Stop if there was a syntax error.
+        if (_hadError)
+            return;
+
+        writeln(new ASTPrinter().print(expression));
     }
 
     public static void error(int line, string message)
