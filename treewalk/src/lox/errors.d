@@ -10,13 +10,13 @@ module lox.errors;
 import lox.token;
 
 
-class RuntimeError: Exception
+public class RuntimeError: Exception
 {
-    const Token _token;
+    public const Token token;
 
-    this(Token token, string message)
+    public this(Token token, string message)
     {
         super(message);
-        _token = token;
+        this.token = token;
     }
 }

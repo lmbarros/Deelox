@@ -8,10 +8,17 @@
 module lox.lox;
 
 import lox.token;
+import lox.errors;
+import lox.interpreter;
 
 
 public struct Lox
 {
+    public static this()
+    {
+        _interpreter = new Interpreter();
+    }
+
     public static void runFile(const string file)
     {
         import core.stdc.stdlib: exit;
@@ -23,6 +30,9 @@ public struct Lox
         // Indicate an error in the exit code.
         if (_hadError)
             exit(65);
+
+        if (_hadRuntimeError)
+            exit(70);
     }
 
     public static void runPrompt()
@@ -39,7 +49,6 @@ public struct Lox
 
     private static void run(string source)
     {
-        import std.stdio: writeln;
         import lox.scanner: Scanner;
         import lox.parser: Parser;
         import lox.expr: Expr;
@@ -55,7 +64,7 @@ public struct Lox
         if (_hadError)
             return;
 
-        writeln(new ASTPrinter().print(expression));
+        _interpreter.interpret(expression);
     }
 
     public static void error(int line, string message)
@@ -71,6 +80,14 @@ public struct Lox
             report(token.line, " at '" ~ token.lexeme ~ "'", message);
     }
 
+    public static void runtimeError(RuntimeError error)
+    {
+        import std.stdio: writefln;
+        writefln("%s\n[line %s]", error.msg, error.token.line);
+        _hadRuntimeError = true;
+    }
+
+
     public static void report(int line, string where, string message)
     {
         import std.stdio: writefln;
@@ -78,5 +95,7 @@ public struct Lox
         _hadError = true;
     }
 
+    private static Interpreter _interpreter;
     private static bool _hadError = false;
+    private static bool _hadRuntimeError = false;
 }

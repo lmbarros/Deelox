@@ -14,6 +14,22 @@ import lox.token;
 
 public class Interpreter: Visitor
 {
+    public void interpret(Expr expression)
+    {
+        try
+        {
+            import std.stdio: writeln;
+
+            auto value = evaluate(expression);
+            writeln(stringify(value));
+        }
+        catch (RuntimeError error)
+        {
+            import lox.lox: Lox;
+            Lox.runtimeError(error);
+        }
+    }
+
     public override Variant visitLiteralExpr(Literal expr)
     {
         return expr.value;
@@ -81,11 +97,20 @@ public class Interpreter: Visitor
         return a == b;
     }
 
+    private string stringify(Variant object)
+    {
+        import std.conv: to;
+
+        if (!object.hasValue)
+            return "nil";
+
+        return to!string(object);
+    }
+
     private Variant evaluate(Expr expr)
     {
         return expr.accept(this);
     }
-
 
     public override Variant visitBinaryExpr(Binary expr)
     {
