@@ -8,6 +8,7 @@
 module lox.interpreter;
 
 import lox.expr;
+import lox.errors;
 import lox.token;
 
 
@@ -33,11 +34,28 @@ public class Interpreter: Visitor
               return Variant(!isTruthy(right));
 
             case MINUS:
+                checkNumberOperand(expr.operator, right);
                 return Variant(-right.get!double());
 
             default:
                 assert(false, "Can't happen");
         }
+    }
+
+    private void checkNumberOperand(Token operator, Variant operand)
+    {
+        if (operand.type == typeid(double))
+            return;
+
+        throw new RuntimeError(operator, "Operand must be a number.");
+    }
+
+    private void checkNumberOperands(Token operator,Variant left, Variant right)
+    {
+        if (left.type == typeid(double) && right.type == typeid(double))
+            return;
+
+        throw new RuntimeError(operator, "Operands must be numbers.");
     }
 
     private bool isTruthy(Variant object)
@@ -77,12 +95,16 @@ public class Interpreter: Visitor
         with (TokenType) switch (expr.operator.type)
         {
             case GREATER:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!double() > right.get!double());
             case GREATER_EQUAL:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!double() >= right.get!double());
             case LESS:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!double() < right.get!double());
             case LESS_EQUAL:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!double() <= right.get!double());
 
             case BANG_EQUAL:
@@ -91,6 +113,7 @@ public class Interpreter: Visitor
                 return Variant(isEqual(left, right));
 
             case MINUS:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!(double) - right.get!(double));
 
             case PLUS:
@@ -100,12 +123,15 @@ public class Interpreter: Visitor
                 if (left.type == typeid(string) && right.type == typeid(string))
                     return Variant(left.get!string() ~ right.get!string());
 
-                assert(false, "I guess I should handle this case");
+                throw new RuntimeError(expr.operator,
+                    "Operands must be two numbers or two strings.");
 
             case SLASH:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!(double) / right.get!(double));
 
             case STAR:
+                checkNumberOperands(expr.operator, left, right);
                 return Variant(left.get!(double) * right.get!(double));
 
             default:
