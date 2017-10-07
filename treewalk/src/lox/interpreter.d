@@ -7,7 +7,7 @@
 
 module lox.interpreter;
 
-import lox.expr;
+import lox.ast;
 import lox.errors;
 import lox.token;
 

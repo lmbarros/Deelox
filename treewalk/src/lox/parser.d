@@ -8,7 +8,7 @@
 module lox.parser;
 
 import lox.token;
-import lox.expr;
+import lox.ast;
 
 
 public class ParseError: Exception

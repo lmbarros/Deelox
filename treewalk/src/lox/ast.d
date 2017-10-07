@@ -5,7 +5,7 @@
 // http://www.craftinginterpreters.com)
 //
 
-module lox.expr;
+module lox.ast;
 
 
 // TODO: This is just a straightforward convertion from Bob's Java code. Should

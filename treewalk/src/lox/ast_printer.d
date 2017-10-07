@@ -7,7 +7,7 @@
 
 module lox.ast_printer;
 
-import lox.expr;
+import lox.ast;
 
 
 // Creates an unambiguous, if ugly, string representation of AST nodes.
