@@ -12,7 +12,7 @@ import lox.errors;
 import lox.token;
 
 
-public class Interpreter: Visitor
+public class Interpreter: ExprVisitor
 {
     public void interpret(Expr expression)
     {

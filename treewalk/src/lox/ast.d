@@ -11,7 +11,7 @@ module lox.ast;
 // TODO: This is just a straightforward convertion from Bob's Java code. Should
 //       work, but isn't as efficient as could be (`Token`s are passed by value,
 //       for example. Those `Variant`s don't smell good either).
-private string generateASTClasses(const string baseName)
+private string generateASTClasses(const string baseName, const string[] types)
 {
     import std.algorithm.iteration: splitter;
     import std.string: strip;
@@ -39,7 +39,7 @@ private string generateASTClasses(const string baseName)
         code ~= "    }\n\n";
 
         // Visitor pattern
-        code ~= "    public override Variant accept(Visitor visitor)\n"
+        code ~= "    public override Variant accept(" ~ baseName ~"Visitor visitor)\n"
               ~ "    {\n"
               ~ "        return visitor.visit" ~ className ~ baseName ~ "(this);\n"
               ~ "    }\n\n";
@@ -57,7 +57,7 @@ private string generateASTClasses(const string baseName)
     {
         auto code = "\n";
 
-        code ~= "public interface Visitor\n"
+        code ~= "public interface " ~ baseName ~ "Visitor\n"
               ~ "{\n";
 
         foreach (type; types)
@@ -73,19 +73,12 @@ private string generateASTClasses(const string baseName)
         return code;
     }
 
-    const types = [
-        "Binary   : Expr left, Token operator, Expr right",
-        "Grouping : Expr expression",
-        "Literal  : Variant value",
-        "Unary    : Token operator, Expr right"
-    ];
-
     auto code = "import lox.token;\n"
         ~ "public import std.variant;\n\n"
 
         ~ "public abstract class " ~ baseName ~ "\n"
         ~ "{\n"
-        ~ "    public abstract Variant accept(Visitor visitor);\n"
+        ~ "    public abstract Variant accept(" ~ baseName ~ "Visitor visitor);\n"
         ~ "}\n\n";
 
     code ~= defineVisitor(baseName, types);
@@ -100,7 +93,18 @@ private string generateASTClasses(const string baseName)
     return code;
 }
 
-mixin(generateASTClasses("Expr"));
+mixin(generateASTClasses("Expr", [
+    "Binary   : Expr left, Token operator, Expr right",
+    "Grouping : Expr expression",
+    "Literal  : Variant value",
+    "Unary    : Token operator, Expr right"
+]));
+
+mixin(generateASTClasses("Stmt", [
+    "Expression : Expr expression",
+    "Print      : Expr expression"
+]));
+
 
 version(none)
 {

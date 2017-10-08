@@ -11,7 +11,7 @@ import lox.ast;
 
 
 // Creates an unambiguous, if ugly, string representation of AST nodes.
-class ASTPrinter: Visitor
+class ASTPrinter: ExprVisitor
 {
     string print(Expr expr)
     {
