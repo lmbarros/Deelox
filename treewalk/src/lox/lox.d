@@ -58,13 +58,13 @@ public struct Lox
         auto tokens = scanner.scanTokens();
 
         auto parser = new Parser(tokens);
-        auto expression = parser.parse();
+        auto statements = parser.parse();
 
         // Stop if there was a syntax error.
         if (_hadError)
             return;
 
-        _interpreter.interpret(expression);
+        _interpreter.interpret(statements);
     }
 
     public static void error(int line, string message)

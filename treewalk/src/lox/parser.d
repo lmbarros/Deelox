@@ -30,21 +30,41 @@ public class Parser
         _tokens = tokens;
     }
 
-    public Expr parse()
+    public Stmt[] parse()
     {
-        try
-        {
-            return expression();
-        }
-        catch (ParseError error)
-        {
-            return null;
-        }
+        Stmt[] statements;
+
+        while (!isAtEnd())
+            statements ~= statement();
+
+        return statements;
     }
 
     private Expr expression()
     {
         return equality();
+    }
+
+    private Stmt statement()
+    {
+        if (match(TokenType.PRINT))
+            return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement()
+    {
+        auto value = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        return new Print(value);
+    }
+
+    private Stmt expressionStatement()
+    {
+        auto expr = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        return new Expression(expr);
     }
 
     private Expr equality()

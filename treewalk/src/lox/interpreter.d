@@ -12,16 +12,14 @@ import lox.errors;
 import lox.token;
 
 
-public class Interpreter: ExprVisitor
+public class Interpreter: ExprVisitor, StmtVisitor
 {
-    public void interpret(Expr expression)
+    public void interpret(Stmt[] statements)
     {
         try
         {
-            import std.stdio: writeln;
-
-            auto value = evaluate(expression);
-            writeln(stringify(value));
+            foreach (statement; statements)
+                execute(statement);
         }
         catch (RuntimeError error)
         {
@@ -110,6 +108,27 @@ public class Interpreter: ExprVisitor
     private Variant evaluate(Expr expr)
     {
         return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt)
+    {
+        stmt.accept(this);
+    }
+
+    public override Variant visitExpressionStmt(Expression stmt)
+    {
+        evaluate(stmt.expression);
+        return Variant();
+    }
+
+    public override Variant visitPrintStmt(Print stmt)
+    {
+        import std.stdio: writeln;
+        auto value = evaluate(stmt.expression);
+
+        writeln(stringify(value));
+
+        return Variant();
     }
 
     public override Variant visitBinaryExpr(Binary expr)
