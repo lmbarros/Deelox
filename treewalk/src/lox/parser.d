@@ -35,7 +35,7 @@ public class Parser
         Stmt[] statements;
 
         while (!isAtEnd())
-            statements ~= statement();
+            statements ~= declaration();
 
         return statements;
     }
@@ -43,6 +43,22 @@ public class Parser
     private Expr expression()
     {
         return equality();
+    }
+
+    private Stmt declaration()
+    {
+        try
+        {
+            if (match(TokenType.VAR))
+                return varDeclaration();
+
+            return statement();
+        }
+        catch (ParseError error)
+        {
+            synchronize();
+            return null;
+        }
     }
 
     private Stmt statement()
@@ -58,6 +74,20 @@ public class Parser
         auto value = expression();
         consume(TokenType.SEMICOLON, "Expect ';' after value.");
         return new Print(value);
+    }
+
+    private Stmt varDeclaration()
+    {
+        auto name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(TokenType.EQUAL))
+        {
+            initializer = expression();
+        }
+
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+        return new Var(name, initializer);
     }
 
     private Stmt expressionStatement()
@@ -145,6 +175,9 @@ public class Parser
             return new Literal(Variant(null));
         with (TokenType) if (match(NUMBER, STRING))
             return new Literal(previous().literal);
+
+        if (match(TokenType.IDENTIFIER))
+            return new Variable(previous());
 
         if (match(TokenType.LEFT_PAREN))
         {

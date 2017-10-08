@@ -8,12 +8,18 @@
 module lox.interpreter;
 
 import lox.ast;
+import lox.environment;
 import lox.errors;
 import lox.token;
 
 
 public class Interpreter: ExprVisitor, StmtVisitor
 {
+    public this()
+    {
+        _environment = new Environment();
+    }
+
     public void interpret(Stmt[] statements)
     {
         try
@@ -54,6 +60,11 @@ public class Interpreter: ExprVisitor, StmtVisitor
             default:
                 assert(false, "Can't happen");
         }
+    }
+
+    public override Variant visitVariableExpr(Variable expr)
+    {
+        return _environment.get(expr.name);
     }
 
     private void checkNumberOperand(Token operator, Variant operand)
@@ -123,11 +134,21 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     public override Variant visitPrintStmt(Print stmt)
     {
-        import std.stdio: writeln;
         auto value = evaluate(stmt.expression);
+        import std.stdio: writeln;
 
         writeln(stringify(value));
 
+        return Variant();
+    }
+
+    public override Variant visitVarStmt(Var stmt)
+    {
+        Variant value;
+        if (stmt.initializer !is null)
+            value = evaluate(stmt.initializer);
+
+        _environment.define(stmt.name.lexeme, value);
         return Variant();
     }
 
@@ -182,4 +203,6 @@ public class Interpreter: ExprVisitor, StmtVisitor
                 assert(false, "Can't happen");
         }
     }
+
+    private Environment _environment;
 }

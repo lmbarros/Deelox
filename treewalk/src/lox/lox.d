@@ -52,7 +52,6 @@ public struct Lox
         import lox.scanner: Scanner;
         import lox.parser: Parser;
         import lox.ast: Expr;
-        import lox.ast_printer: ASTPrinter;
 
         auto scanner = new Scanner(source);
         auto tokens = scanner.scanTokens();

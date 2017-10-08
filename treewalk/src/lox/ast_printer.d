@@ -9,7 +9,7 @@ module lox.ast_printer;
 
 import lox.ast;
 
-
+/+
 // Creates an unambiguous, if ugly, string representation of AST nodes.
 class ASTPrinter: ExprVisitor
 {
@@ -73,3 +73,4 @@ version (TestASTPrinter)
          writeln(new ASTPrinter().print(expression));
     }
 }
++/
