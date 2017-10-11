@@ -28,5 +28,17 @@ public class Environment
         throw new RuntimeError(name, "Undefined variable '" ~ name.lexeme ~ "'.");
     }
 
+    public void assign(Token name, Variant value)
+    {
+        if (name.lexeme in _values)
+        {
+            _values[name.lexeme] = value;
+            return;
+        }
+
+        throw new RuntimeError(name,
+            "Undefined variable '" ~ name.lexeme ~ "'.");
+    }
+
     private Variant[string] _values;
 }

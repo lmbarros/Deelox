@@ -152,6 +152,14 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+    public override Variant visitAssignExpr(Assign expr)
+    {
+        auto value = evaluate(expr.value);
+
+        _environment.assign(expr.name, value);
+        return value;
+    }
+
     public override Variant visitBinaryExpr(Binary expr)
     {
         auto left = evaluate(expr.left);

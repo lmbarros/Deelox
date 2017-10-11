@@ -42,7 +42,7 @@ public class Parser
 
     private Expr expression()
     {
-        return equality();
+        return assignment();
     }
 
     private Stmt declaration()
@@ -95,6 +95,27 @@ public class Parser
         auto expr = expression();
         consume(TokenType.SEMICOLON, "Expect ';' after expression.");
         return new Expression(expr);
+    }
+
+    private Expr assignment()
+    {
+        auto expr = equality();
+
+        if (match(TokenType.EQUAL))
+        {
+            auto equals = previous();
+            auto value = assignment();
+
+            if (auto varExpr = cast(Variable)expr)
+            {
+                auto name = varExpr.name;
+                return new Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
     private Expr equality()
