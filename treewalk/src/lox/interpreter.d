@@ -85,7 +85,7 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     private bool isTruthy(Variant object)
     {
-        if (!object.hasValue)
+        if (object.type is typeid(null))
             return false;
 
         if (object.type == typeid(bool))
@@ -97,10 +97,10 @@ public class Interpreter: ExprVisitor, StmtVisitor
     private bool isEqual(Variant a, Variant b)
     {
         // nil is only equal to nil.
-        if (!a.hasValue && !b.hasValue)
+        if (a.type == typeid(null) && b.type == typeid(null))
             return true;
 
-        if (!a.hasValue)
+        if (a.type == typeid(null))
             return false;
 
         return a == b;
@@ -110,7 +110,7 @@ public class Interpreter: ExprVisitor, StmtVisitor
     {
         import std.conv: to;
 
-        if (!object.hasValue)
+        if (object.type == typeid(null))
             return "nil";
 
         return to!string(object);

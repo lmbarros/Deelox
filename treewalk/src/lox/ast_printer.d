@@ -30,7 +30,7 @@ class ASTPrinter: ExprVisitor
 
     public override Variant visitLiteralExpr(Literal expr)
     {
-        if (!expr.value.hasValue)
+        if (expr.value.type is typeid(null))
             return Variant("nil");
         return Variant(expr.value.toString());
     }
