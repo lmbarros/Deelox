@@ -126,6 +126,24 @@ public class Interpreter: ExprVisitor, StmtVisitor
         stmt.accept(this);
     }
 
+    private void executeBlock(Stmt[] statements, Environment environment)
+    {
+        auto previous = _environment;
+        scope(exit)
+            _environment = previous;
+
+        _environment = environment;
+
+        foreach (statement; statements)
+            execute(statement);
+    }
+
+    public override Variant visitBlockStmt(Block stmt)
+    {
+        executeBlock(stmt.statements, new Environment(_environment));
+        return Variant();
+    }
+
     public override Variant visitExpressionStmt(Expression stmt)
     {
         evaluate(stmt.expression);
