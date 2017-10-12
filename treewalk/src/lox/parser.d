@@ -225,7 +225,7 @@ public class Parser
         throw error(peek(), "Expect expression.");
     }
 
-    // Consumes the token.
+    // Consumes the token (if it matches any of the `types`).
     private bool match(TokenType[] types...)
     {
         foreach (type; types)
