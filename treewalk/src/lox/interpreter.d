@@ -39,6 +39,26 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return expr.value;
     }
 
+    public override Variant visitLogicalExpr(Logical expr)
+    {
+        auto left = evaluate(expr.left);
+
+        if (expr.operator.type == TokenType.OR)
+        {
+            if (isTruthy(left))
+                return left;
+        }
+        else
+        {
+            assert(expr.operator.type == TokenType.AND);
+
+            if (!isTruthy(left))
+                return left;
+        }
+
+        return evaluate(expr.right);
+    }
+
     public override Variant visitGroupingExpr(Grouping expr)
     {
         return evaluate(expr.expression);

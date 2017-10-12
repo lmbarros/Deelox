@@ -132,7 +132,7 @@ public class Parser
 
     private Expr assignment()
     {
-        auto expr = equality();
+        auto expr = or();
 
         if (match(TokenType.EQUAL))
         {
@@ -146,6 +146,34 @@ public class Parser
             }
 
             error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private Expr or()
+    {
+        auto expr = and();
+
+        while (match(TokenType.OR))
+        {
+            auto operator = previous();
+            auto right = and();
+            expr = new Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr and()
+    {
+        auto expr = equality();
+
+        while (match(TokenType.AND))
+        {
+            auto operator = previous();
+            auto right = equality();
+            expr = new Logical(expr, operator, right);
         }
 
         return expr;
