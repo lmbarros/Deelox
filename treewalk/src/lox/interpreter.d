@@ -150,6 +150,17 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+
+    public override Variant visitIfStmt(If stmt)
+    {
+        if (isTruthy(evaluate(stmt.condition)))
+            execute(stmt.thenBranch);
+        else if (stmt.elseBranch !is null)
+            execute(stmt.elseBranch);
+
+        return Variant();
+    }
+
     public override Variant visitPrintStmt(Print stmt)
     {
         auto value = evaluate(stmt.expression);
