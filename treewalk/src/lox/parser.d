@@ -69,6 +69,9 @@ public class Parser
         if (match(TokenType.PRINT))
             return printStatement();
 
+        if (match(TokenType.WHILE))
+            return whileStatement();
+
         if (match(TokenType.LEFT_BRACE))
             return new Block(block());
 
@@ -109,6 +112,16 @@ public class Parser
 
         consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
         return new Var(name, initializer);
+    }
+
+    private Stmt whileStatement()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+        auto condition = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+        auto theBody = statement();
+
+        return new While(condition, theBody);
     }
 
     private Stmt expressionStatement()

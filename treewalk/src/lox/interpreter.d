@@ -201,6 +201,15 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+
+    public override Variant visitWhileStmt(While stmt)
+    {
+        while (isTruthy(evaluate(stmt.condition)))
+            execute(stmt.body);
+
+        return Variant();
+    }
+
     public override Variant visitAssignExpr(Assign expr)
     {
         auto value = evaluate(expr.value);
