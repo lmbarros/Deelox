@@ -63,6 +63,9 @@ public class Parser
 
     private Stmt statement()
     {
+        if (match(TokenType.FOR))
+            return forStatement();
+
         if (match(TokenType.IF))
             return ifStatement();
 
@@ -76,6 +79,49 @@ public class Parser
             return new Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt forStatement()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+        Stmt initializer;
+        if (match(TokenType.SEMICOLON))
+            initializer = null;
+        else if (match(TokenType.VAR))
+            initializer = varDeclaration();
+        else
+            initializer = expressionStatement();
+
+        Expr condition = null;
+        if (!check(TokenType.SEMICOLON))
+            condition = expression();
+        consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+
+        Expr increment = null;
+        if (!check(TokenType.RIGHT_PAREN))
+            increment = expression();
+
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        // Desugaring (AKA lowering)
+        auto body = statement();
+        if (increment !is null)
+        {
+            body = new Block([
+                body,
+                new Expression(increment)
+            ]);
+        }
+
+        if (condition is null)
+            condition = new Literal(Variant(true));
+        body = new While(condition, body);
+
+        if (initializer !is null)
+            body = new Block([initializer, body]);
+
+        return body;
     }
 
     private Stmt ifStatement()
