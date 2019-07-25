@@ -303,7 +303,40 @@ public class Parser
             return new Unary(operator, right);
         }
 
-        return primary();
+        return call();
+    }
+
+    private Expr finishCall(Expr callee)
+    {
+        Expr[] arguments = [ ];
+        if (!check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (arguments.length >= 255)
+                    error(peek(), "Cannot have more than 255 arguments.");
+                arguments ~= expression();
+            }
+            while (match(TokenType.COMMA));
+        }
+
+        Token paren = consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Call(callee, paren, arguments);
+    }
+
+    private Expr call()
+    {
+        Expr expr = primary();
+        while (true)
+        {
+            if (match(TokenType.LEFT_PAREN))
+                expr = finishCall(expr);
+            else
+                break;
+        }
+
+        return expr;
     }
 
     private Expr primary()

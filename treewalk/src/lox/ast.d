@@ -96,6 +96,7 @@ private string generateASTClasses(const string baseName, const string[] types)
 mixin(generateASTClasses("Expr", [
     "Assign   : Token name, Expr value",
     "Binary   : Expr left, Token operator, Expr right",
+    "Call     : Expr callee, Token paren, Expr[] arguments",
     "Grouping : Expr expression",
     "Literal  : Variant value",
     "Logical  : Expr left, Token operator, Expr right",

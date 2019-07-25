@@ -8,6 +8,7 @@
 module lox.interpreter;
 
 import lox.ast;
+import lox.callable;
 import lox.environment;
 import lox.errors;
 import lox.token;
@@ -17,7 +18,13 @@ public class Interpreter: ExprVisitor, StmtVisitor
 {
     public this()
     {
-        _environment = new Environment();
+        import std.variant: Variant;
+        import lox.builtins: Clock;
+
+        _globals = new Environment();
+        _environment = _globals;
+
+        _globals.define("clock", Variant(new Clock()));
     }
 
     public void interpret(Stmt[] statements)
@@ -270,5 +277,33 @@ public class Interpreter: ExprVisitor, StmtVisitor
         }
     }
 
+    public override Variant visitCallExpr(Call expr)
+    {
+        import std.conv: to;
+
+        Variant callee = evaluate(expr.callee);
+
+        Variant[] arguments = [ ];
+        foreach (argument; expr.arguments)
+            arguments ~= evaluate(argument);
+
+        if (callee.peek!Callable() !is null)
+        {
+            throw new RuntimeError(expr.paren,
+                "Can only call functions and classes.");
+        }
+
+        auto func = callee.get!(Callable);
+        if (arguments.length != func.arity())
+        {
+            throw new RuntimeError(expr.paren, "Expected " ~
+                to!string(func.arity()) ~ " arguments but got " ~
+                to!string(arguments.length) ~ ".");
+        }
+
+        return func.call(this, arguments);
+    }
+
+    private Environment _globals;
     private Environment _environment;
 }
