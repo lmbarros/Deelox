@@ -205,7 +205,7 @@ struct Scanner
         advance();
 
         // Trim the surrounding quotes. This would be the point to unescape
-        // characters, if escaped characters were suported.
+        // characters, if escaped characters were supported.
         const value = _source[_start + 1 .. _current - 1];
         addToken(TokenType.STRING, value);
     }

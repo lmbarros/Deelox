@@ -8,7 +8,7 @@
 module lox.ast;
 
 
-// TODO: This is just a straightforward convertion from Bob's Java code. Should
+// TODO: This is just a straightforward conversion from Bob's Java code. Should
 //       work, but isn't as efficient as could be (`Token`s are passed by value,
 //       for example. Those `Variant`s don't smell good either).
 private string generateASTClasses(const string baseName, const string[] types)
@@ -117,7 +117,7 @@ version(none)
 {
     static this()
     {
-        import std.stdio;
+        import std.stdio: writeln;
         writeln(generateASTClasses("Expr"));
     }
 }

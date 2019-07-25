@@ -386,7 +386,7 @@ public class Parser
 
     private ParseError error(Token token, string message)
     {
-        import lox.lox;
+        import lox.lox: Lox;
         Lox.error(token, message);
         return new ParseError();
     }
