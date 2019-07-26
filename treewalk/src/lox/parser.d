@@ -107,23 +107,23 @@ public class Parser
         consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
 
         // Desugaring (AKA lowering)
-        auto body = statement();
+        auto theBody = statement();
         if (increment !is null)
         {
-            body = new Block([
-                body,
+            theBody = new Block([
+                theBody,
                 new Expression(increment)
             ]);
         }
 
         if (condition is null)
             condition = new Literal(Variant(true));
-        body = new While(condition, body);
+        theBody = new While(condition, theBody);
 
         if (initializer !is null)
-            body = new Block([initializer, body]);
+            theBody = new Block([initializer, theBody]);
 
-        return body;
+        return theBody;
     }
 
     private Stmt ifStatement()
