@@ -11,6 +11,7 @@ import lox.ast;
 import lox.callable;
 import lox.environment;
 import lox.errors;
+import lox.lox_function;
 import lox.token;
 
 
@@ -153,7 +154,7 @@ public class Interpreter: ExprVisitor, StmtVisitor
         stmt.accept(this);
     }
 
-    private void executeBlock(Stmt[] statements, Environment environment)
+    public void executeBlock(Stmt[] statements, Environment environment)
     {
         auto previous = _environment;
         scope(exit)
@@ -175,6 +176,14 @@ public class Interpreter: ExprVisitor, StmtVisitor
     {
         evaluate(stmt.expression);
         return Variant();
+    }
+
+
+    public override Variant visitFunctionStmt(Function stmt)
+    {
+        LoxFunction func = new LoxFunction(stmt);
+        _environment.define(stmt.name.lexeme, Variant(func));
+        return Variant(null);
     }
 
 
@@ -302,6 +311,10 @@ public class Interpreter: ExprVisitor, StmtVisitor
         }
 
         return func.call(this, arguments);
+    }
+
+    Environment globals() {
+        return _globals;
     }
 
     private Environment _globals;

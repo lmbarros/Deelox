@@ -49,6 +49,8 @@ public class Parser
     {
         try
         {
+            if (match(TokenType.FUN))
+                return func("function");
             if (match(TokenType.VAR))
                 return varDeclaration();
 
@@ -175,6 +177,33 @@ public class Parser
         auto expr = expression();
         consume(TokenType.SEMICOLON, "Expect ';' after expression.");
         return new Expression(expr);
+    }
+
+    private Function func(string kind)
+    {
+        with(TokenType)
+        {
+            Token name = consume(IDENTIFIER, "Expect " ~ kind ~ " name.");
+
+            consume(LEFT_PAREN, "Expect '(' after " ~ kind ~ " name.");
+            Token[] parameters = [ ];
+            if (!check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.length >= 8)
+                        error(peek(), "Cannot have more than 8 parameters.");
+
+                    parameters ~= consume(IDENTIFIER, "Expect parameter name.");
+                }
+                while (match(COMMA));
+            }
+            consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+            consume(LEFT_BRACE, "Expect '{' before " ~ kind ~ " body.");
+            auto theBody = block();
+            return new Function(name, parameters, theBody);
+        }
     }
 
     private Stmt[] block()

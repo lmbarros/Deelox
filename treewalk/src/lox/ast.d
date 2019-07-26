@@ -107,6 +107,7 @@ mixin(generateASTClasses("Expr", [
 mixin(generateASTClasses("Stmt", [
     "Block      : Stmt[] statements",
     "Expression : Expr expression",
+    "Function   : Token name, Token[] params, Stmt[] theBody",
     "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
     "Print      : Expr expression",
     "Var        : Token name, Expr initializer",
