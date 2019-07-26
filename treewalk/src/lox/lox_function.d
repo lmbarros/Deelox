@@ -12,6 +12,7 @@ import lox.ast;
 import lox.callable;
 import lox.environment;
 import lox.interpreter;
+import lox.return_exception;
 
 
 class LoxFunction: Callable
@@ -29,7 +30,16 @@ class LoxFunction: Callable
         for (int i = 0; i < _declaration.params.length; ++i)
             environment.define(_declaration.params[i].lexeme, arguments[i]);
 
-        interpreter.executeBlock(_declaration.theBody, environment);
+
+        try
+        {
+            interpreter.executeBlock(_declaration.theBody, environment);
+        }
+        catch (ReturnException returnValue)
+        {
+            return returnValue.value;
+        }
+
         return Variant(null);
     }
 

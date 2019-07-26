@@ -12,6 +12,7 @@ import lox.callable;
 import lox.environment;
 import lox.errors;
 import lox.lox_function;
+import lox.return_exception;
 import lox.token;
 
 
@@ -205,6 +206,19 @@ public class Interpreter: ExprVisitor, StmtVisitor
         writeln(stringify(value));
 
         return Variant();
+    }
+
+    public override Variant visitReturnStmt(Return stmt)
+    {
+        Variant value = null;
+        if (stmt.value !is null)
+            value = evaluate(stmt.value);
+
+        // Implementing return as an exception (we can have an arbitrary variety
+        // of things in the interpreter call stack between this point and the
+        // function caller; using exceptions as flow control here simplifies
+        // things a lot!)
+        throw new ReturnException(value);
     }
 
     public override Variant visitVarStmt(Var stmt)
