@@ -18,18 +18,19 @@ import lox.return_exception;
 class LoxFunction: Callable
 {
     private Function _declaration;
+    private Environment _closure;
 
-    public this(Function declaration)
+    public this(Function declaration, Environment closure)
     {
         _declaration = declaration;
+        _closure = closure;
     }
 
     public override Variant call(Interpreter interpreter, Variant[] arguments)
     {
-        Environment environment = new Environment(interpreter.globals());
+        Environment environment = new Environment(_closure);
         for (int i = 0; i < _declaration.params.length; ++i)
             environment.define(_declaration.params[i].lexeme, arguments[i]);
-
 
         try
         {

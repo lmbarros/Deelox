@@ -182,7 +182,7 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     public override Variant visitFunctionStmt(Function stmt)
     {
-        LoxFunction func = new LoxFunction(stmt);
+        LoxFunction func = new LoxFunction(stmt, _environment);
         _environment.define(stmt.name.lexeme, Variant(func));
         return Variant(null);
     }
