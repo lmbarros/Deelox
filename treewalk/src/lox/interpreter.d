@@ -11,6 +11,7 @@ import lox.ast;
 import lox.callable;
 import lox.environment;
 import lox.errors;
+import lox.lox_class;
 import lox.lox_function;
 import lox.return_exception;
 import lox.token;
@@ -191,12 +192,19 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+    public override Variant visitClassStmt(Class stmt)
+    {
+        _environment.define(stmt.name.lexeme, Variant(null));
+        LoxClass klass = new LoxClass(stmt.name.lexeme);
+        _environment.assign(stmt.name, Variant(klass));
+        return Variant();
+    }
+
     public override Variant visitExpressionStmt(Expression stmt)
     {
         evaluate(stmt.expression);
         return Variant();
     }
-
 
     public override Variant visitFunctionStmt(Function stmt)
     {

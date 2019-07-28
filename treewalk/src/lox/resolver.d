@@ -95,6 +95,13 @@ class Resolver: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+    public override Variant visitClassStmt(Class stmt)
+    {
+        declare(stmt.name);
+        define(stmt.name);
+        return Variant();
+    }
+
     public override Variant visitExpressionStmt(Expression stmt)
     {
         resolve(stmt.expression);

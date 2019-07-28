@@ -49,6 +49,8 @@ public class Parser
     {
         try
         {
+            if (match(TokenType.CLASS))
+                return classDeclaration();
             if (match(TokenType.FUN))
                 return func("function");
             if (match(TokenType.VAR))
@@ -60,6 +62,23 @@ public class Parser
         {
             synchronize();
             return null;
+        }
+    }
+
+    private Stmt classDeclaration()
+    {
+        with (TokenType)
+        {
+            Token name = consume(IDENTIFIER, "Expect class name.");
+            consume(LEFT_BRACE, "Expect '{' before class body.");
+
+            Function[] methods;
+            while (!check(RIGHT_BRACE) && !isAtEnd())
+                methods ~= func("method");
+
+            consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+            return new Class(name, methods);
         }
     }
 
