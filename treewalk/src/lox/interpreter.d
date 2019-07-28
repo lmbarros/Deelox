@@ -93,7 +93,20 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     public override Variant visitVariableExpr(Variable expr)
     {
-        return _environment.get(expr.name);
+        return lookUpVariable(expr.name, expr);
+    }
+
+    private Variant lookUpVariable(Token name, Expr expr)
+    {
+        if (expr in _locals)
+        {
+            int distance = _locals[expr];
+            return _environment.getAt(distance, name.lexeme);
+        }
+        else
+        {
+            return _globals.get(name);
+        }
     }
 
     private void checkNumberOperand(Token operator, Variant operand)
@@ -153,6 +166,11 @@ public class Interpreter: ExprVisitor, StmtVisitor
     private void execute(Stmt stmt)
     {
         stmt.accept(this);
+    }
+
+    public void resolve(Expr expr, int depth)
+    {
+        _locals[expr] = depth;
     }
 
     public void executeBlock(Stmt[] statements, Environment environment)
@@ -244,7 +262,16 @@ public class Interpreter: ExprVisitor, StmtVisitor
     {
         auto value = evaluate(expr.value);
 
-        _environment.assign(expr.name, value);
+        if (expr in _locals)
+        {
+            int distance = _locals[expr];
+            _environment.assignAt(distance, expr.name, value);
+        }
+        else
+        {
+            globals.assign(expr.name, value);
+        }
+
         return value;
     }
 
@@ -333,4 +360,8 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     private Environment _globals;
     private Environment _environment;
+
+    // No need for fancy recursive data structure here; Expr are objects, each
+    // with their own identity. We'll not have any trouble of messing up scopes.
+    private int[Expr] _locals;
 }

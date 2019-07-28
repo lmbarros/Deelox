@@ -10,6 +10,7 @@ module lox.lox;
 import lox.token;
 import lox.errors;
 import lox.interpreter;
+import lox.resolver;
 
 
 public struct Lox
@@ -60,6 +61,13 @@ public struct Lox
         auto statements = parser.parse();
 
         // Stop if there was a syntax error.
+        if (_hadError)
+            return;
+
+        auto resolver = new Resolver(_interpreter);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
         if (_hadError)
             return;
 

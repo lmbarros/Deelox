@@ -29,6 +29,24 @@ public class Environment
         _values[name] = value;
     }
 
+    Environment ancestor(int distance)
+    {
+        Environment environment = this;
+        for (int i = 0; i < distance; ++i)
+            environment = environment._enclosing;
+        return environment;
+    }
+
+    public Variant getAt(int distance, string name)
+    {
+        return ancestor(distance)._values[name];
+    }
+
+    public void assignAt(int distance, Token name, Variant value)
+    {
+        ancestor(distance)._values[name.lexeme] = value;
+    }
+
     public Variant get(Token name)
     {
         auto pValue = name.lexeme in _values;
