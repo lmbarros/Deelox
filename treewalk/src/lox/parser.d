@@ -265,7 +265,16 @@ public class Parser
                 auto name = varExpr.name;
                 return new Assign(name, value);
             }
-
+            else if (auto varExpr = cast(Get)expr)
+            {
+                // Given properties, the LHS of an assignment can be arbitrarily
+                // long (think `foo.goo.hoo.ioo = 123`). So, we use a parser
+                // trick here: parse the LHS as a normal Get expression, then,
+                // when we find the `=` (here!) we take its guts and use them to
+                // construct the Set expression we want.
+                Get get = varExpr;
+                return new Set(get.object, get.name, value);
+            }
             error(equals, "Invalid assignment target.");
         }
 
@@ -393,9 +402,18 @@ public class Parser
         while (true)
         {
             if (match(TokenType.LEFT_PAREN))
+            {
                 expr = finishCall(expr);
+            }
+            else if (match(TokenType.DOT))
+            {
+                Token name = consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+                expr = new Get(expr, name);
+            }
             else
+            {
                 break;
+            }
         }
 
         return expr;

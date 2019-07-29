@@ -13,6 +13,7 @@ import lox.environment;
 import lox.errors;
 import lox.lox_class;
 import lox.lox_function;
+import lox.lox_instance;
 import lox.return_exception;
 import lox.token;
 
@@ -67,6 +68,20 @@ public class Interpreter: ExprVisitor, StmtVisitor
         }
 
         return evaluate(expr.right);
+    }
+
+    public override Variant visitSetExpr(Set expr)
+    {
+        Variant object = evaluate(expr.object);
+        LoxInstance* pObject = object.peek!LoxInstance();
+
+        if (pObject is null)
+            throw new RuntimeError(expr.name, "Only instances have fields.");
+
+        Variant value = evaluate(expr.value);
+        pObject.set(expr.name, value);
+
+        return Variant();
     }
 
     public override Variant visitGroupingExpr(Grouping expr)
@@ -360,6 +375,15 @@ public class Interpreter: ExprVisitor, StmtVisitor
         }
 
         return func.call(this, arguments);
+    }
+
+    public override Variant visitGetExpr(Get expr)
+    {
+        Variant object = evaluate(expr.object);
+        if (object.peek!LoxInstance() !is null)
+            return object.get!LoxInstance().get(expr.name);
+
+        throw new RuntimeError(expr.name, "Only instances have properties.");
     }
 
     Environment globals() {

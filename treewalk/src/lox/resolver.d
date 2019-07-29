@@ -190,6 +190,14 @@ class Resolver: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+    public override Variant visitGetExpr(Get expr)
+    {
+        // We resolve only the object, not the property. Properties in Lox are
+        // "very dynamic" and thus handled only in run-time, by the Interpreter.
+        resolve(expr.object);
+        return Variant();
+    }
+
     public override Variant visitGroupingExpr(Grouping expr)
     {
         resolve(expr.expression);
@@ -205,6 +213,15 @@ class Resolver: ExprVisitor, StmtVisitor
     {
         resolve(expr.left);
         resolve(expr.right);
+        return Variant();
+    }
+
+    public override Variant visitSetExpr(Set expr)
+    {
+        // Again the property itself (expr.name) is dynamic, handled only in
+        // runtime by the Interpreter.
+        resolve(expr.value);
+        resolve(expr.object);
         return Variant();
     }
 
