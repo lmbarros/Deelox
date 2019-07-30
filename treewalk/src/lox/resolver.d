@@ -21,6 +21,7 @@ class Resolver: ExprVisitor, StmtVisitor
     {
         NONE,
         FUNCTION,
+        METHOD,
     }
 
     alias scope_t = bool[string];
@@ -99,6 +100,13 @@ class Resolver: ExprVisitor, StmtVisitor
     {
         declare(stmt.name);
         define(stmt.name);
+
+        foreach (method; stmt.methods)
+        {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(method, declaration);
+        }
+
         return Variant();
     }
 

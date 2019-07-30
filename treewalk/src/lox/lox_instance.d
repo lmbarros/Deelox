@@ -3,12 +3,15 @@ module lox.lox_instance;
 import std.variant;
 import lox.errors;
 import lox.lox_class;
+import lox.lox_function;
 import lox.token;
 
 
 class LoxInstance
 {
     private LoxClass _class;
+
+    // "Where an instance stores state, the class stores behavior." (10.4)
     private Variant[string] _fields;
 
     public this(LoxClass klass)
@@ -20,6 +23,10 @@ class LoxInstance
     {
         if (name.lexeme in _fields)
             return _fields[name.lexeme];
+
+        LoxFunction method = _class.findMethod(name.lexeme);
+        if (method !is null)
+            return Variant(method);
 
         throw new RuntimeError(name, "Undefined property '" ~ name.lexeme ~ "'.");
     }
