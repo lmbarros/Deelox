@@ -12,6 +12,7 @@ import lox.ast;
 import lox.callable;
 import lox.environment;
 import lox.interpreter;
+import lox.lox_instance;
 import lox.return_exception;
 
 
@@ -24,6 +25,13 @@ class LoxFunction: Callable
     {
         _declaration = declaration;
         _closure = closure;
+    }
+
+    LoxFunction bind(LoxInstance instance)
+    {
+        Environment environment = new Environment(_closure);
+        environment.define("this", Variant(instance));
+        return new LoxFunction(_declaration, environment);
     }
 
     public override Variant call(Interpreter interpreter, Variant[] arguments)

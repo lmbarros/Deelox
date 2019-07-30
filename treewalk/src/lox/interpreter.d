@@ -84,6 +84,11 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+    public override Variant visitThisExpr(This expr)
+    {
+        return lookUpVariable(expr.keyword, expr);
+    }
+
     public override Variant visitGroupingExpr(Grouping expr)
     {
         return evaluate(expr.expression);

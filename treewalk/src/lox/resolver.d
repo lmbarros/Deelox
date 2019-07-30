@@ -101,11 +101,16 @@ class Resolver: ExprVisitor, StmtVisitor
         declare(stmt.name);
         define(stmt.name);
 
+        beginScope();
+        _scopes[$-1]["this"] = true;
+
         foreach (method; stmt.methods)
         {
             FunctionType declaration = FunctionType.METHOD;
             resolveFunction(method, declaration);
         }
+
+        endScope();
 
         return Variant();
     }
@@ -230,6 +235,12 @@ class Resolver: ExprVisitor, StmtVisitor
         // runtime by the Interpreter.
         resolve(expr.value);
         resolve(expr.object);
+        return Variant();
+    }
+
+    public override Variant visitThisExpr(lox.ast.This expr)
+    {
+        resolveLocal(expr, expr.keyword);
         return Variant();
     }
 

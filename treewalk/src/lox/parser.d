@@ -430,6 +430,9 @@ public class Parser
         with (TokenType) if (match(NUMBER, STRING))
             return new Literal(previous().literal);
 
+        if (match(TokenType.THIS))
+            return new This(previous());
+
         if (match(TokenType.IDENTIFIER))
             return new Variable(previous());
 
