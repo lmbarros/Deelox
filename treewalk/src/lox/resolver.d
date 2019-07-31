@@ -24,12 +24,18 @@ class Resolver: ExprVisitor, StmtVisitor
         METHOD,
     }
 
+    private enum ClassType {
+        NONE,
+        CLASS,
+    }
+
     alias scope_t = bool[string];
     alias stack_t = scope_t[];
 
     private Interpreter _interpreter;
     private stack_t _scopes;
     private FunctionType _currentFunction = FunctionType.NONE;
+    private ClassType _currentClass = ClassType.NONE;
 
     public this(Interpreter interpreter)
     {
@@ -98,6 +104,9 @@ class Resolver: ExprVisitor, StmtVisitor
 
     public override Variant visitClassStmt(Class stmt)
     {
+        const enclosingClass = _currentClass;
+        _currentClass = ClassType.CLASS;
+
         declare(stmt.name);
         define(stmt.name);
 
@@ -111,7 +120,7 @@ class Resolver: ExprVisitor, StmtVisitor
         }
 
         endScope();
-
+        _currentClass = enclosingClass;
         return Variant();
     }
 
@@ -240,6 +249,12 @@ class Resolver: ExprVisitor, StmtVisitor
 
     public override Variant visitThisExpr(lox.ast.This expr)
     {
+        if (_currentClass == ClassType.NONE)
+        {
+            Lox.error(expr.keyword, "Cannot use 'this' outside of a class.");
+            return Variant();
+        }
+
         resolveLocal(expr, expr.keyword);
         return Variant();
     }
