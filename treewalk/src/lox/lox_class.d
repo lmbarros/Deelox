@@ -35,12 +35,20 @@ class LoxClass: Callable
     public override Variant call(Interpreter interpreter, Variant[] arguments)
     {
         LoxInstance instance = new LoxInstance(this);
+
+        LoxFunction initializer = findMethod("init");
+        if (initializer !is null)
+            initializer.bind(instance).call(interpreter, arguments);
+
         return Variant(instance);
     }
 
     public override int arity()
     {
-        return 0;
+        LoxFunction initializer = findMethod("init");
+        if (initializer is null)
+            return 0;
+        return initializer.arity();
     }
 
 }

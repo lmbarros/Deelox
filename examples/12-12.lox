@@ -1,0 +1,5 @@
+class Foo {
+  init() {
+    return "something else"; // an error! Cannot return a value from init()
+  }
+}

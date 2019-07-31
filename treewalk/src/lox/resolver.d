@@ -21,6 +21,7 @@ class Resolver: ExprVisitor, StmtVisitor
     {
         NONE,
         FUNCTION,
+        INITIALIZER,
         METHOD,
     }
 
@@ -116,6 +117,9 @@ class Resolver: ExprVisitor, StmtVisitor
         foreach (method; stmt.methods)
         {
             FunctionType declaration = FunctionType.METHOD;
+            if (method.name.lexeme == "init")
+                declaration = FunctionType.INITIALIZER;
+
             resolveFunction(method, declaration);
         }
 
@@ -160,7 +164,11 @@ class Resolver: ExprVisitor, StmtVisitor
             Lox.error(stmt.keyword, "Cannot return from top-level code.");
 
         if (stmt.value !is null)
+        {
+            if (_currentFunction == FunctionType.INITIALIZER)
+                Lox.error(stmt.keyword, "Cannot return a value from an initializer.");
             resolve(stmt.value);
+        }
 
         return Variant();
     }

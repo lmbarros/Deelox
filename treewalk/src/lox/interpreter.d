@@ -219,7 +219,8 @@ public class Interpreter: ExprVisitor, StmtVisitor
         LoxFunction[string] methods;
         foreach (method; stmt.methods)
         {
-            auto func = new LoxFunction(method, _environment);
+            LoxFunction func = new LoxFunction(
+                method, _environment, method.name.lexeme == "init");
             methods[method.name.lexeme] = func;
         }
 
@@ -237,7 +238,7 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     public override Variant visitFunctionStmt(Function stmt)
     {
-        LoxFunction func = new LoxFunction(stmt, _environment);
+        LoxFunction func = new LoxFunction(stmt, _environment, false);
         _environment.define(stmt.name.lexeme, Variant(func));
         return Variant(null);
     }

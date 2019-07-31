@@ -20,9 +20,14 @@ class LoxFunction: Callable
 {
     private Function _declaration;
     private Environment _closure;
+    private bool _isInitializer;
 
-    public this(Function declaration, Environment closure)
+    public this(Function declaration, Environment closure, bool isInitializer)
     {
+        // Cannot simply look at the method name, because the user might have
+        // defined an `init` function (not method), which doesn't have a `this`.
+        _isInitializer = isInitializer;
+
         _declaration = declaration;
         _closure = closure;
     }
@@ -31,7 +36,7 @@ class LoxFunction: Callable
     {
         Environment environment = new Environment(_closure);
         environment.define("this", Variant(instance));
-        return new LoxFunction(_declaration, environment);
+        return new LoxFunction(_declaration, environment, _isInitializer);
     }
 
     public override Variant call(Interpreter interpreter, Variant[] arguments)
@@ -46,8 +51,16 @@ class LoxFunction: Callable
         }
         catch (ReturnException returnValue)
         {
+            if (_isInitializer)
+                return _closure.getAt(0, "this");
             return returnValue.value;
         }
+
+        // Initializers return `this` (because this will simplify the VM-based
+        // implementation of Lox, see
+        // http://www.craftinginterpreters.com/classes.html#constructors-and-initializers)
+        if (_isInitializer)
+            return _closure.getAt(0, "this");
 
         return Variant(null);
     }
