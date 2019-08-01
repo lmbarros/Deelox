@@ -25,9 +25,11 @@ class Resolver: ExprVisitor, StmtVisitor
         METHOD,
     }
 
-    private enum ClassType {
+    private enum ClassType
+    {
         NONE,
         CLASS,
+        SUBCLASS,
     }
 
     alias scope_t = bool[string];
@@ -115,7 +117,10 @@ class Resolver: ExprVisitor, StmtVisitor
             Lox.error(stmt.superclass.name, "A class cannot inherit from itself.");
 
         if (stmt.superclass !is null)
+        {
+            _currentClass = ClassType.SUBCLASS;
             resolve(stmt.superclass);
+        }
 
         if (stmt.superclass !is null)
         {
@@ -273,6 +278,11 @@ class Resolver: ExprVisitor, StmtVisitor
 
     public override Variant visitSuperExpr(Super expr)
     {
+        if (_currentClass == ClassType.NONE)
+            Lox.error(expr.keyword, "Cannot use 'super' outside of a class.");
+        else if (_currentClass != ClassType.SUBCLASS)
+            Lox.error(expr.keyword, "Cannot use 'super' in a class with no superclass.");
+
         resolveLocal(expr, expr.keyword);
         return Variant();
     }
