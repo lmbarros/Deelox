@@ -77,6 +77,11 @@ public class Environment
             "Undefined variable '" ~ name.lexeme ~ "'.");
     }
 
+    public Environment enclosing()
+    {
+        return _enclosing;
+    }
+
     private Variant[string] _values;
     private Environment _enclosing;
 }

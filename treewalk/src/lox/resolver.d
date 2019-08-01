@@ -117,6 +117,12 @@ class Resolver: ExprVisitor, StmtVisitor
         if (stmt.superclass !is null)
             resolve(stmt.superclass);
 
+        if (stmt.superclass !is null)
+        {
+            beginScope();
+            _scopes[$-1]["super"] = true;
+        }
+
         beginScope();
         _scopes[$-1]["this"] = true;
 
@@ -130,6 +136,10 @@ class Resolver: ExprVisitor, StmtVisitor
         }
 
         endScope();
+
+        if (stmt.superclass !is null)
+            endScope();
+
         _currentClass = enclosingClass;
         return Variant();
     }
@@ -258,6 +268,12 @@ class Resolver: ExprVisitor, StmtVisitor
         // runtime by the Interpreter.
         resolve(expr.value);
         resolve(expr.object);
+        return Variant();
+    }
+
+    public override Variant visitSuperExpr(Super expr)
+    {
+        resolveLocal(expr, expr.keyword);
         return Variant();
     }
 

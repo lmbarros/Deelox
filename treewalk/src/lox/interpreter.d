@@ -84,6 +84,22 @@ public class Interpreter: ExprVisitor, StmtVisitor
         return Variant();
     }
 
+    public override Variant visitSuperExpr(Super expr)
+    {
+        int distance = _locals[expr];
+        LoxClass superclass = _environment.getAt(distance, "super").get!LoxClass();
+
+        // "this" is always one level nearer than "super"'s environment.
+        LoxInstance object = _environment.getAt(distance - 1, "this").get!LoxInstance();
+
+        LoxFunction method = superclass.findMethod(expr.method.lexeme);
+
+        if (method is null)
+            throw new RuntimeError(expr.method, "Undefined property '" ~ expr.method.lexeme ~ "'.");
+
+        return Variant(method.bind(object));
+    }
+
     public override Variant visitThisExpr(This expr)
     {
         return lookUpVariable(expr.keyword, expr);
@@ -227,6 +243,12 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
         _environment.define(stmt.name.lexeme, Variant(null));
 
+        if (stmt.superclass !is null)
+        {
+            _environment = new Environment(_environment);
+            _environment.define("super", Variant(superclass));
+        }
+
         LoxFunction[string] methods;
         foreach (method; stmt.methods)
         {
@@ -236,6 +258,9 @@ public class Interpreter: ExprVisitor, StmtVisitor
         }
 
         LoxClass klass = new LoxClass(stmt.name.lexeme, superclass, methods);
+
+        if (superclass !is null)
+            _environment = _environment.enclosing();
 
         _environment.assign(stmt.name, Variant(klass));
         return Variant();

@@ -438,6 +438,14 @@ public class Parser
         with (TokenType) if (match(NUMBER, STRING))
             return new Literal(previous().literal);
 
+        with (TokenType) if (match(SUPER))
+        {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super'.");
+            Token method = consume(IDENTIFIER, "Expect superclass method name.");
+            return new Super(keyword, method);
+        }
+
         if (match(TokenType.THIS))
             return new This(previous());
 
