@@ -214,6 +214,17 @@ public class Interpreter: ExprVisitor, StmtVisitor
 
     public override Variant visitClassStmt(Class stmt)
     {
+        LoxClass superclass;
+
+        if (stmt.superclass !is null)
+        {
+            auto pSubclass = evaluate(stmt.superclass).peek!LoxClass();
+            superclass = pSubclass ? *pSubclass : null;
+
+            if (superclass is null)
+                throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+        }
+
         _environment.define(stmt.name.lexeme, Variant(null));
 
         LoxFunction[string] methods;
@@ -224,7 +235,7 @@ public class Interpreter: ExprVisitor, StmtVisitor
             methods[method.name.lexeme] = func;
         }
 
-        LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+        LoxClass klass = new LoxClass(stmt.name.lexeme, superclass, methods);
 
         _environment.assign(stmt.name, Variant(klass));
         return Variant();

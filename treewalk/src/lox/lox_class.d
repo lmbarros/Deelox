@@ -10,12 +10,14 @@ import lox.interpreter;
 class LoxClass: Callable
 {
     public string name;
+    public LoxClass superclass;
 
     // "Where an instance stores state, the class stores behavior." (10.4)
     private LoxFunction[string] _methods;
 
-    public this(string name, LoxFunction[string] methods)
+    public this(string name, LoxClass superclass, LoxFunction[string] methods)
     {
+        this.superclass = superclass;
         this.name = name;
         _methods = methods;
     }
@@ -24,6 +26,10 @@ class LoxClass: Callable
     {
         if (name in _methods)
             return _methods[name];
+
+        if (superclass !is null)
+            return superclass.findMethod(name);
+
         return null;
     }
 

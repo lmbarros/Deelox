@@ -70,6 +70,14 @@ public class Parser
         with (TokenType)
         {
             Token name = consume(IDENTIFIER, "Expect class name.");
+
+            Variable superclass = null;
+            if (match(LESS))
+            {
+                consume(IDENTIFIER, "Expect superclass name.");
+                superclass = new Variable(previous());
+            }
+
             consume(LEFT_BRACE, "Expect '{' before class body.");
 
             Function[] methods;
@@ -78,7 +86,7 @@ public class Parser
 
             consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-            return new Class(name, methods);
+            return new Class(name, superclass, methods);
         }
     }
 

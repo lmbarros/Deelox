@@ -111,6 +111,12 @@ class Resolver: ExprVisitor, StmtVisitor
         declare(stmt.name);
         define(stmt.name);
 
+        if (stmt.superclass !is null && stmt.name.lexeme == stmt.superclass.name.lexeme)
+            Lox.error(stmt.superclass.name, "A class cannot inherit from itself.");
+
+        if (stmt.superclass !is null)
+            resolve(stmt.superclass);
+
         beginScope();
         _scopes[$-1]["this"] = true;
 
