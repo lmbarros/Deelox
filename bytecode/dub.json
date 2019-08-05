@@ -1,0 +1,10 @@
+{
+	"name": "deelox",
+	"authors": [
+		"Leandro Motta Barros"
+	],
+	"description": "Robert Nystrom's Lox (or so) in D",
+	"copyright": "Copyright © 2019, Leandro Motta Barros",
+	"license": "MIT",
+	"buildOptions": ["betterC"]
+}
