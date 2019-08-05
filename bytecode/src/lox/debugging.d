@@ -21,6 +21,7 @@ void disassemble(ref Chunk chunk, const char* name)
 }
 
 
+/// Disassembles a simple instruction (one that doesn't take any arguments).
 private size_t simpleInstruction(const char* name, size_t offset)
 {
     printf("%s\n", name);
