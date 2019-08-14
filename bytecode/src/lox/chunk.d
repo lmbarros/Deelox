@@ -7,7 +7,7 @@
 
 module lox.chunk;
 
-import lox.memory;
+import lox.dynamic_array;
 
 
 /// An "operation code" representing one instruction in our VM.
@@ -23,50 +23,7 @@ enum OpCode: ubyte
  */
 struct Chunk
 {
-    /// The number of elements in the array.
-    size_t count;
+    DynamicArray!ubyte code;
 
-    /// The capacity allocated for the array.
-    size_t capacity;
-
-    /// The array data (including allocated but unused space).
-    ubyte* code;
-
-    /**
-     * Initializes the chunk.
-     *
-     * A brand new Chunk already has all its state initialized as required, but
-     * this is useful to re-initialize a freed Chunk to recycle it.
-     */
-    private void initialize()
-    {
-        count = 0;
-        capacity = 0;
-        code = null;
-    }
-
-
-    /// Appends `data` to the chunk.
-    void write(ubyte data)
-    {
-        if (capacity < count + 1)
-        {
-            const oldCapacity = capacity;
-            capacity = growCapacity(oldCapacity);
-            code = growArray!(ubyte)(code, oldCapacity, capacity);
-        }
-
-        code[count] = data;
-        ++count;
-    }
-
-    /**
-     * Frees the memory used by this Chunk. Leaves it in a usable state, as if
-     * brand new.
-     */
-    void free()
-    {
-        freeArray!ubyte(code, capacity);
-        initialize();
-    }
+    alias code this;
 }
