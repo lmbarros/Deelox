@@ -21,6 +21,20 @@ void disassemble(ref Chunk chunk, const char* name)
 }
 
 
+/// Disassembles a CONSTANT instruction from `chunk`.
+private size_t constantInstruction(const char* name, ref Chunk chunk, size_t offset)
+{
+    import lox.value: print;
+
+    const constant = chunk[offset + 1];
+    printf("%-16s %4d '", name, constant);
+    chunk.constants[constant].print();
+    printf("'\n");
+
+    return offset + 2;
+}
+
+
 /// Disassembles a simple instruction (one that doesn't take any arguments).
 private size_t simpleInstruction(const char* name, size_t offset)
 {
@@ -43,6 +57,9 @@ size_t disassembleInstruction(ref Chunk chunk, size_t offset)
     // code, so a `default` case is due.
     with (OpCode) switch (instruction)
     {
+        case CONSTANT:
+            return constantInstruction("CONSTANT", chunk, offset);
+
         case RETURN:
             return simpleInstruction("RETURN", offset);
 

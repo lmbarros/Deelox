@@ -12,6 +12,10 @@ extern(C) void main(string[] args)
 {
   Chunk chunk;
   scope(exit) chunk.free();
+
+  const constant = chunk.addConstant(1.2);
+  chunk.write(OpCode.CONSTANT);
+  chunk.write(cast(ubyte)constant);
   chunk.write(OpCode.RETURN);
   chunk.disassemble("test chunk");
 }
