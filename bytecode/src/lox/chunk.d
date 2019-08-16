@@ -37,11 +37,36 @@ struct Chunk
     /// The pool with all constants accessible from this chunk of bytecode.
     DynamicArray!Value constants;
 
+    /**
+     * The line numbers of the source code that generated this chunk of
+     * bytecode. There is one element here for every element in `code`. The line
+     * number that generated a given bytecode instruction are on the same
+     * indices in these two arrays.
+     *
+     * Incidentally, this is one of these cases in which can clearly see the
+     * trade-off between convenience and performance. Here we are using a
+     * convenient `DynamicArray`. In the book C code, Bob simply stores an array
+     * of integers, without count and capacity information (because this
+     * redundant with the `code` count and capacity).
+     */
+    DynamicArray!int lines;
+
+    /**
+     * Writes one byte of bytecode to this chunk, alongside with the line number
+     * of the source code that generated this byte code.
+     */
+    void write(ubyte byteCode, int line)
+    {
+        code.write(byteCode);
+        lines.write(line);
+    }
+
     /// Frees all resources allocated by this `Chunk`.
     void free()
     {
         code.free();
         constants.free();
+        lines.free();
     }
 
     /**
