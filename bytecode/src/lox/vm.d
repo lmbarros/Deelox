@@ -82,10 +82,10 @@ struct VM
 
                 // Print the contents of the value stack
                 printf("          ");
-                for (auto slot = stack; slot < stackTop; ++slot)
+                for (auto slot = &stack[0]; slot < stackTop; ++slot)
                 {
                     printf("[ ");
-                    printValue(*slot);
+                    print(*slot);
                     printf(" ]");
                 }
                 printf("\n");
