@@ -95,15 +95,19 @@ struct VM
             }
 
             const instruction = readByte();
-            switch (instruction)
+            with (OpCode) switch (instruction)
             {
-                case OpCode.CONSTANT:
+                case CONSTANT:
                     // "Loading a constant" means pushing it into the value stack.
                     const constant = readConstant();
                     push(constant);
                     break;
 
-                case OpCode.RETURN:
+                case NEGATE:
+                    push(-pop());
+                    break;
+
+                case RETURN:
                     import core.stdc.stdio: printf;
                     print(pop());
                     printf("\n");

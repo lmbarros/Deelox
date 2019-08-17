@@ -20,6 +20,9 @@ enum OpCode: ubyte
      */
     CONSTANT,
 
+    /// Unary minus (-) operator. Negates the element on the top of the stack.
+    NEGATE,
+
     /// Return from the current function.
     RETURN,
 }

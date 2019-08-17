@@ -21,6 +21,7 @@ extern(C) void main(string[] args)
   const constant = chunk.addConstant(1.2);
   chunk.write(OpCode.CONSTANT, 123);
   chunk.write(cast(ubyte)constant, 123);
+  chunk.write(OpCode.NEGATE, 123);
   chunk.write(OpCode.RETURN, 123);
 
   chunk.disassemble("test chunk");
