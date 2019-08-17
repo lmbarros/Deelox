@@ -22,6 +22,7 @@ extern(C) void main(string[] args)
   chunk.write(OpCode.CONSTANT, 123);
   chunk.write(cast(ubyte)constant, 123);
   chunk.write(OpCode.RETURN, 123);
+
   chunk.disassemble("test chunk");
 
   vm.interpret(chunk);

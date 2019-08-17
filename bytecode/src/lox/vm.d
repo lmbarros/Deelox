@@ -36,10 +36,24 @@ struct VM
      */
     ubyte* ip;
 
+    /// The maximum number of values in the value stack.
+    enum maxStack = 256;
+
+    /// The value stack.
+    Value[maxStack] stack;
+
+    /**
+     * A pointer to a value one element beyond the top of `stack`.
+     *
+     * Another way to think of it: if a new element is to be pushed, it will be
+     * pushed here.
+     */
+    Value* stackTop;
+
     /// Initializes the virtual machine.
     void initialize()
     {
-        // Nothing for now.
+        resetStack();
     }
 
     /// Frees the virtual machine resources.
@@ -64,6 +78,19 @@ struct VM
             version(DebugTraceExecution)
             {
                 import lox.debugging: disassembleInstruction;
+                import core.stdc.stdio: printf;
+
+                // Print the contents of the value stack
+                printf("          ");
+                for (auto slot = stack; slot < stackTop; ++slot)
+                {
+                    printf("[ ");
+                    printValue(*slot);
+                    printf(" ]");
+                }
+                printf("\n");
+
+                // Disassemble the instruction we are about to execute
                 disassembleInstruction(*chunk, cast(size_t)(ip - chunk.code.data));
             }
 
@@ -71,19 +98,35 @@ struct VM
             switch (instruction)
             {
                 case OpCode.CONSTANT:
-                    import core.stdc.stdio: printf;
+                    // "Loading a constant" means pushing it into the value stack.
                     const constant = readConstant();
-                    print(constant);
-                    printf("\n");
+                    push(constant);
                     break;
 
                 case OpCode.RETURN:
+                    import core.stdc.stdio: printf;
+                    print(pop());
+                    printf("\n");
                     return InterpretResult.OK;
 
                 default:
                     assert(false);
             }
         }
+    }
+
+    /// Pushes `value` into `stack`.
+    private void push(Value value)
+    {
+        *stackTop = value;
+        ++stackTop;
+    }
+
+    /// Pops and returns a value from the top o `stack`.
+    private Value pop()
+    {
+        --stackTop;
+        return *stackTop;
     }
 
     /**
@@ -103,5 +146,14 @@ struct VM
     private Value readConstant()
     {
         return chunk.constants[readByte()];
+    }
+
+    /**
+     * Resets values stack. Kinda like (logically) removing all elements and
+     * making sure it is ready to use.
+     */
+    private void resetStack()
+    {
+        stackTop = &stack[0];
     }
 }
