@@ -6,5 +6,15 @@
 	"description": "Robert Nystrom's Lox (or so) in D",
 	"copyright": "Copyright © 2019, Leandro Motta Barros",
 	"license": "MIT",
-	"buildOptions": ["betterC"]
+	"buildOptions": ["betterC"],
+	"targetType": "executable",
+	"configurations": [
+		{
+			"name": "default"
+		},
+		{
+			"name": "troubleshoot",
+			"versions": ["DebugTraceExecution"]
+		}
+	]
 }

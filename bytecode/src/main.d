@@ -7,9 +7,14 @@
 
 import lox.chunk;
 import lox.debugging;
+import lox.vm;
 
 extern(C) void main(string[] args)
 {
+  VM vm;
+  vm.initialize();
+  scope(exit) vm.free();
+
   Chunk chunk;
   scope(exit) chunk.free();
 
@@ -18,4 +23,6 @@ extern(C) void main(string[] args)
   chunk.write(cast(ubyte)constant, 123);
   chunk.write(OpCode.RETURN, 123);
   chunk.disassemble("test chunk");
+
+  vm.interpret(chunk);
 }
