@@ -50,7 +50,11 @@ enum OpCode: ubyte
 
 
 /**
- * A blob of bytecode. More precisely, a dynamic array of bytecode.
+ * A blob of bytecode.
+ *
+ * More precisely, a dynamic array of bytecode, a dynamic array of constants,
+ * and one or two additional goodies, like a dynamic array mapping bytecode to
+ * the source code line that generated it (used for error reporting).
  */
 struct Chunk
 {
