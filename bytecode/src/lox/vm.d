@@ -8,6 +8,7 @@
 module lox.vm;
 
 import lox.chunk;
+import lox.compiler;
 import lox.value;
 
 
@@ -62,12 +63,11 @@ struct VM
         // Nothing for now.
     }
 
-    /// Interprets a given chunk of bytecode.
-    InterpretResult interpret(ref Chunk chunk)
+    /// Interprets the source code given as the `source` string.
+    InterpretResult interpret(char* source)
     {
-        this.chunk = &chunk;
-        this.ip = chunk.code.data;
-        return run();
+        compile(source);
+        return InterpretResult.OK;
     }
 
     /// Interprets `chunk`.
@@ -101,6 +101,22 @@ struct VM
                     // "Loading a constant" means pushing it into the value stack.
                     const constant = readConstant();
                     push(constant);
+                    break;
+
+                case ADD:
+                    binaryArithmeticOpAdd();
+                    break;
+
+                case SUBTRACT:
+                    binaryArithmeticOpSubtract();
+                    break;
+
+                case MULTIPLY:
+                    binaryArithmeticOpMultiply();
+                    break;
+
+                case DIVIDE:
+                    binaryArithmeticOpDivide();
                     break;
 
                 case NEGATE:
@@ -160,4 +176,24 @@ struct VM
     {
         stackTop = &stack[0];
     }
+
+    mixin(genBinaryArithmeticOp!("Add", "+"));
+    mixin(genBinaryArithmeticOp!("Subtract", "-"));
+    mixin(genBinaryArithmeticOp!("Multiply", "*"));
+    mixin(genBinaryArithmeticOp!("Divide", "/"));
+}
+
+/**
+ * Generates code (to be used as a string mixin) for function implementing a
+ * binary arithmetic operator.
+ */
+private template genBinaryArithmeticOp(string name, string op)
+{
+    const char[] genBinaryArithmeticOp = `
+        private void binaryArithmeticOp` ~ name ~ `()
+        {
+            const b = pop();
+            const a = pop();
+            push(a` ~ op ~ `b);
+        }`;
 }

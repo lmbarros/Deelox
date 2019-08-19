@@ -64,6 +64,18 @@ size_t disassembleInstruction(ref Chunk chunk, size_t offset)
         case CONSTANT:
             return constantInstruction("CONSTANT", chunk, offset);
 
+        case ADD:
+            return simpleInstruction("ADD", offset);
+
+        case SUBTRACT:
+            return simpleInstruction("SUBTRACT", offset);
+
+        case MULTIPLY:
+            return simpleInstruction("MULTIPLY", offset);
+
+        case DIVIDE:
+            return simpleInstruction("DIVIDE", offset);
+
         case NEGATE:
             return simpleInstruction("NEGATE", offset);
 

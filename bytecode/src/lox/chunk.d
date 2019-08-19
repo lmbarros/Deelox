@@ -20,6 +20,27 @@ enum OpCode: ubyte
      */
     CONSTANT,
 
+    /// Addition. Pops two values from the stack, adds them up, push the result.
+    ADD,
+
+    /**
+     * Subtraction. Pops two values from the stack, subtracts the first one from
+     * the second one, push the result.
+     */
+    SUBTRACT,
+
+    /**
+     * Multiplication. Pops two values from the stack, multiplies them together,
+     * push the result.
+     */
+    MULTIPLY,
+
+    /**
+     * Division. Pops two values from the stack, divides the second one by the
+     * first one, push the result.
+     */
+    DIVIDE,
+
     /// Unary minus (-) operator. Negates the element on the top of the stack.
     NEGATE,
 
