@@ -10,11 +10,12 @@
 	"targetType": "executable",
 	"configurations": [
 		{
-			"name": "default"
+			"name": "default",
+			"versions": ["DebugPrintCode"]
 		},
 		{
 			"name": "troubleshoot",
-			"versions": ["DebugTraceExecution"]
+			"versions": ["DebugTraceExecution", "DebugPrintCode"]
 		}
 	]
 }

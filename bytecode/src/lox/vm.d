@@ -26,7 +26,7 @@ enum InterpretResult
 struct VM
 {
     /// The chunk being interpreted.
-    Chunk* chunk;
+    Chunk chunk;
 
     /**
      * The instruction pointer. Points to the instruction (within `chunk.code`)
@@ -66,8 +66,17 @@ struct VM
     /// Interprets the source code given as the `source` string.
     InterpretResult interpret(char* source)
     {
-        compile(source);
-        return InterpretResult.OK;
+        Compiler compiler;
+
+        // Notice that `chunk.free()` leaves `chunk` ready to be used again.
+        scope(exit) chunk.free();
+
+        if (!compiler.compile(source, &chunk))
+            return InterpretResult.COMPILE_ERROR;
+
+        ip = chunk.code.data;
+
+        return run();
     }
 
     /// Interprets `chunk`.
